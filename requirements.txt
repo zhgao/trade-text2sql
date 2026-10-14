@@ -7,3 +7,7 @@ sqlparse>=0.4,<0.5
 python-dotenv>=1.0,<2.0
 pytest>=8.0,<9.0
 httpx>=0.27,<0.29
+# 多数据库支持（SQLAlchemy 统一执行层；驱动只在对应 DATABASE_URL 时才用到）
+sqlalchemy>=2.0,<3.0
+psycopg2-binary>=2.9
+pymysql>=1.1
