@@ -12,8 +12,9 @@ from pydantic import BaseModel
 
 from backend.agent import config
 from backend.agent.graph import run_question
+from backend.agent.guardrail import ALLOWED_TABLES
 from backend.agent.schema_catalog import SCHEMA_CATALOG
-from backend.db.db import DB_PATH, init_db
+from backend.db.db import DB_PATH, execute_sql, init_db
 
 load_dotenv()
 
@@ -82,6 +83,50 @@ def health():
 def schema():
     """Return the table schema with English annotations (for frontend/debugging)."""
     return {"tables": SCHEMA_CATALOG}
+
+
+TABLE_LIMIT_DEFAULT = 50
+TABLE_LIMIT_MAX = 200
+
+
+def _clamp_limit(limit, default=TABLE_LIMIT_DEFAULT, maximum=TABLE_LIMIT_MAX):
+    """Clamp a row limit to [1, maximum]; fall back to default when unparseable."""
+    try:
+        n = int(limit)
+    except (TypeError, ValueError):
+        return default
+    return max(1, min(n, maximum))
+
+
+@app.get("/api/tables/{table_name}")
+def table_rows(table_name: str, limit: int = TABLE_LIMIT_DEFAULT):
+    """Browse raw rows of a whitelisted business table (read-only)."""
+    if table_name not in ALLOWED_TABLES:
+        return JSONResponse(
+            status_code=403,
+            content={"detail": f"Table '{table_name}' is not available for browsing"},
+        )
+    n = _clamp_limit(limit)
+    # table_name comes from the whitelist above, so interpolation is safe
+    columns, rows = execute_sql(f"SELECT * FROM {table_name} LIMIT {n}")
+    return {
+        "table": table_name,
+        "columns": columns,
+        "rows": rows,
+        "limit": n,
+        "count": len(rows),
+    }
+
+
+@app.get("/api/audit")
+def audit(limit: int = TABLE_LIMIT_DEFAULT):
+    """Return the most recent query-audit records, newest first (read-only)."""
+    n = _clamp_limit(limit)
+    _columns, rows = execute_sql(
+        "SELECT id, ts, question, sql_text, row_count, elapsed_ms, has_error, error_msg "
+        f"FROM query_audit ORDER BY ts DESC LIMIT {n}"
+    )
+    return rows
 
 
 @app.post("/api/chat", response_model=ChatResponse)

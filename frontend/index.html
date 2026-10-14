@@ -16,6 +16,10 @@
     --blue-dark: #0060c9;
     --border: #e8e8ed;
     --radius: 18px;
+    --green: #1a7f37;
+    --green-bg: #e6f4ea;
+    --red: #b00020;
+    --red-bg: #fdecea;
   }
   * { box-sizing: border-box; }
   body {
@@ -25,6 +29,7 @@
     color: var(--text);
     -webkit-font-smoothing: antialiased;
   }
+  /* ---------- header + tabs ---------- */
   header {
     background: rgba(255,255,255,0.85);
     backdrop-filter: blur(12px);
@@ -32,22 +37,84 @@
     position: sticky; top: 0; z-index: 10;
   }
   header .inner {
-    max-width: 860px; margin: 0 auto; padding: 16px 24px;
-    display: flex; align-items: center; gap: 12px;
+    max-width: 1020px; margin: 0 auto; padding: 14px 24px;
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
   }
   .logo {
-    width: 38px; height: 38px; border-radius: 11px;
+    width: 38px; height: 38px; border-radius: 11px; flex: none;
     background: linear-gradient(135deg, #0071e3, #42a5f5);
     color: #fff; font-weight: 700; font-size: 20px;
     display: flex; align-items: center; justify-content: center;
   }
-  header h1 { font-size: 20px; margin: 0; font-weight: 600; letter-spacing: 0.2px; }
-  header p { margin: 2px 0 0; font-size: 13px; color: var(--sub); }
-  main { max-width: 860px; margin: 0 auto; padding: 24px 24px 140px; }
-  .hero {
-    background: var(--card); border-radius: var(--radius);
-    padding: 28px; margin-bottom: 20px; border: 1px solid var(--border);
+  .brand h1 { font-size: 19px; margin: 0; font-weight: 600; letter-spacing: 0.2px; }
+  .brand p { margin: 2px 0 0; font-size: 12.5px; color: var(--sub); }
+  .tabs {
+    margin-left: auto; display: flex; gap: 2px; flex: none;
+    background: #ececf0; border-radius: 999px; padding: 3px;
+    max-width: 100%; overflow-x: auto;
   }
+  .tabs button {
+    border: none; background: transparent; border-radius: 999px;
+    padding: 8px 20px; font-size: 14px; font-weight: 500; color: var(--sub);
+    cursor: pointer; white-space: nowrap; transition: all .15s ease;
+  }
+  .tabs button:hover { color: var(--text); }
+  .tabs button.active {
+    background: #fff; color: var(--text); font-weight: 600;
+    box-shadow: 0 1px 4px rgba(0,0,0,.12);
+  }
+  /* ---------- layout ---------- */
+  main { max-width: 1020px; margin: 0 auto; padding: 28px 24px 48px; }
+  main.with-inputbar { padding-bottom: 150px; }
+  section[hidden] { display: none; }
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 28px; margin-bottom: 20px;
+  }
+  .eyebrow {
+    font-size: 12px; font-weight: 700; letter-spacing: 1.5px;
+    color: var(--blue); text-transform: uppercase; margin: 0 0 12px;
+  }
+  h2.big { font-size: 34px; font-weight: 700; letter-spacing: -0.5px; margin: 0 0 12px; line-height: 1.2; }
+  .lede { font-size: 17px; color: var(--sub); line-height: 1.65; margin: 0 0 22px; max-width: 720px; }
+  .btn {
+    display: inline-block; border: none; border-radius: 999px; cursor: pointer;
+    background: var(--blue); color: #fff; font-size: 15px; font-weight: 600;
+    padding: 12px 28px; margin-right: 10px; text-decoration: none;
+  }
+  .btn:hover { background: var(--blue-dark); }
+  .btn.ghost { background: #eef4fc; color: var(--blue); border: 1px solid #d6e6fa; }
+  .btn.ghost:hover { background: #e0edfb; }
+  /* ---------- feature grid ---------- */
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+  .feature {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 22px;
+  }
+  .feature .icon { font-size: 26px; margin-bottom: 10px; }
+  .feature h3 { margin: 0 0 8px; font-size: 16px; font-weight: 600; }
+  .feature p { margin: 0; font-size: 14px; color: var(--sub); line-height: 1.6; }
+  /* ---------- steps ---------- */
+  .steps { display: flex; align-items: stretch; gap: 0; overflow-x: auto; padding-bottom: 4px; }
+  .step { flex: 1 0 150px; text-align: center; padding: 0 8px; position: relative; }
+  .step .n {
+    width: 36px; height: 36px; border-radius: 50%; margin: 0 auto 10px;
+    background: var(--blue); color: #fff; font-weight: 700; font-size: 15px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .step h4 { margin: 0 0 6px; font-size: 14px; }
+  .step p { margin: 0; font-size: 12.5px; color: var(--sub); line-height: 1.5; }
+  .step:not(:last-child)::after {
+    content: "→"; position: absolute; right: -8px; top: 8px;
+    color: #c7c7cc; font-size: 18px;
+  }
+  /* ---------- badges ---------- */
+  .badges { display: flex; flex-wrap: wrap; gap: 10px; }
+  .badge {
+    background: #f5f5f7; border: 1px solid var(--border); border-radius: 999px;
+    padding: 8px 18px; font-size: 14px; font-weight: 500;
+  }
+  /* ---------- Ask tab ---------- */
   .hero h2 { margin: 0 0 6px; font-size: 24px; font-weight: 600; }
   .hero p { margin: 0 0 16px; color: var(--sub); font-size: 15px; line-height: 1.6; }
   .chips { display: flex; flex-wrap: wrap; gap: 10px; }
@@ -57,7 +124,7 @@
     transition: all .15s ease;
   }
   .chip:hover { background: var(--blue); color: #fff; border-color: var(--blue); }
-  #messages { display: flex; flex-direction: column; gap: 14px; }
+  #messages { display: flex; flex-direction: column; gap: 14px; margin-top: 20px; }
   .msg {
     background: var(--card); border: 1px solid var(--border);
     border-radius: var(--radius); padding: 18px 20px; max-width: 100%;
@@ -72,15 +139,18 @@
   .msg pre {
     background: #f5f5f7; border-radius: 10px; padding: 12px 14px;
     overflow-x: auto; font-size: 12.5px; line-height: 1.6; margin: 8px 0 0;
+    white-space: pre-wrap; word-break: break-all;
   }
   table.data { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 13.5px; }
   table.data th, table.data td {
     border: 1px solid var(--border); padding: 8px 10px; text-align: left;
   }
   table.data th { background: #f5f5f7; font-weight: 600; white-space: nowrap; }
-  table.data td { white-space: nowrap; max-width: 260px; overflow: hidden; text-overflow: ellipsis; }
+  table.data td { max-width: 260px; overflow: hidden; text-overflow: ellipsis; }
+  table.data td.num { text-align: right; font-variant-numeric: tabular-nums; }
   .table-wrap { overflow-x: auto; }
-  .err { color: #b00020; font-size: 13px; margin-top: 8px; }
+  .rowcount { color: var(--sub); font-size: 12px; margin-top: 6px; }
+  .err { color: var(--red); font-size: 13px; margin-top: 8px; }
   .typing { color: var(--sub); font-size: 14px; }
   .typing .dot { animation: blink 1.2s infinite; }
   @keyframes blink { 0%,100% {opacity:.2;} 50% {opacity:1;} }
@@ -89,41 +159,178 @@
     background: rgba(255,255,255,0.9); backdrop-filter: blur(12px);
     border-top: 1px solid var(--border); padding: 14px 24px calc(14px + env(safe-area-inset-bottom));
   }
-  .inputbar .inner { max-width: 860px; margin: 0 auto; display: flex; gap: 10px; }
+  footer.inputbar[hidden] { display: none; }
+  .inputbar .inner { max-width: 1020px; margin: 0 auto; display: flex; gap: 10px; }
   #q {
     flex: 1; border: 1px solid var(--border); border-radius: 999px;
-    padding: 13px 20px; font-size: 15px; outline: none; background: #fff;
+    padding: 13px 20px; font-size: 15px; outline: none; background: #fff; min-width: 0;
   }
   #q:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(0,113,227,.12); }
   #send {
     border: none; border-radius: 999px; background: var(--blue); color: #fff;
-    padding: 0 26px; font-size: 15px; font-weight: 600; cursor: pointer;
+    padding: 0 26px; font-size: 15px; font-weight: 600; cursor: pointer; flex: none;
   }
   #send:hover { background: var(--blue-dark); }
   #send:disabled { opacity: .5; cursor: default; }
+  /* ---------- Data / Audit tabs ---------- */
+  .table-picker { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
+  .table-picker button {
+    border: 1px solid var(--border); background: var(--card); border-radius: 999px;
+    padding: 9px 18px; font-size: 14px; cursor: pointer; color: var(--text);
+  }
+  .table-picker button.active { background: var(--text); color: #fff; border-color: var(--text); }
+  .hint { font-size: 13px; color: var(--sub); margin: 10px 0 0; line-height: 1.6; }
+  .pill {
+    display: inline-block; border-radius: 999px; padding: 3px 12px;
+    font-size: 12px; font-weight: 600;
+  }
+  .pill.ok { background: var(--green-bg); color: var(--green); }
+  .pill.bad { background: var(--red-bg); color: var(--red); }
+  .sql-cell { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+  .toggle-sql { color: var(--blue); cursor: pointer; font-size: 12px; font-weight: 500; background: none; border: none; padding: 0; }
+  .loading { color: var(--sub); font-size: 14px; padding: 24px 0; text-align: center; }
+  .sec-title { font-size: 22px; font-weight: 700; margin: 0 0 6px; letter-spacing: -0.3px; }
+  .sec-sub { color: var(--sub); font-size: 14.5px; line-height: 1.65; margin: 0 0 20px; max-width: 760px; }
+  @media (max-width: 640px) {
+    header .inner { padding: 12px 16px; gap: 10px; }
+    .brand p { display: none; }
+    .tabs { margin-left: 0; width: 100%; }
+    .tabs button { padding: 8px 14px; font-size: 13px; flex: 1; }
+    main { padding: 20px 16px 40px; }
+    h2.big { font-size: 27px; }
+    .step:not(:last-child)::after { display: none; }
+    .steps { flex-direction: column; gap: 14px; }
+    .step { text-align: left; display: flex; gap: 12px; align-items: flex-start; }
+    .step .n { margin: 0; flex: none; }
+  }
 </style>
 </head>
 <body>
 <header>
   <div class="inner">
     <div class="logo">TQ</div>
-    <div>
-      <h1>TradeQuery – Trade Finance Intelligence</h1>
-      <p>Letters of Credit · Cargo Tracking · Documents · Payments — the full trade lifecycle in one question</p>
+    <div class="brand">
+      <h1>TradeQuery</h1>
+      <p>Trade Finance Intelligence — L/C · Cargo · Documents · Payments</p>
     </div>
+    <nav class="tabs" id="tabs">
+      <button data-tab="ask" class="active">Ask</button>
+      <button data-tab="overview">Overview</button>
+      <button data-tab="data">Data</button>
+      <button data-tab="audit">Audit</button>
+    </nav>
   </div>
 </header>
 
-<main>
-  <div class="hero">
-    <h2>Ask in plain English, query bank trade data</h2>
-    <p>Try a sample question below — click to send. Your question is converted into SQL against the demo ledger, and the answer is summarized in English.</p>
-    <div class="chips" id="chips"></div>
-  </div>
-  <div id="messages"></div>
+<main id="main" class="with-inputbar">
+
+  <!-- ================= ASK ================= -->
+  <section id="tab-ask">
+    <div class="card hero">
+      <h2>Ask in plain English, query bank trade data</h2>
+      <p>Try a sample question below — click to send. Your question is converted into SQL against the demo ledger, and the answer is summarized in English.</p>
+      <div class="chips" id="chips"></div>
+    </div>
+    <div id="messages"></div>
+  </section>
+
+  <!-- ================= OVERVIEW ================= -->
+  <section id="tab-overview" hidden>
+    <div class="card">
+      <p class="eyebrow">Trade finance · Text-to-SQL</p>
+      <h2 class="big">Turn trade questions into answers.</h2>
+      <p class="lede">TradeQuery lets bankers query the full trade lifecycle — letters of credit, cargo movements, documents and payments — in plain English. No SQL required. Every query is validated by bank-grade guardrails and written to a full audit trail.</p>
+      <div>
+        <button class="btn" data-goto="ask">Try it now</button>
+        <button class="btn ghost" data-goto="data">Browse the data</button>
+      </div>
+    </div>
+
+    <div class="grid" style="margin-bottom:20px">
+      <div class="feature">
+        <div class="icon">💬</div>
+        <h3>Natural Language → SQL</h3>
+        <p>Ask the way you'd ask a colleague. The agent links your question to the right tables and writes correct SQL, guided by few-shot examples tuned for trade finance.</p>
+      </div>
+      <div class="feature">
+        <div class="icon">🛡️</div>
+        <h3>Bank-Grade Guardrails</h3>
+        <p>Every generated query passes five deterministic checks — single statement, SELECT-only, table whitelist, banned keywords, row limits. The database itself opens read-only.</p>
+      </div>
+      <div class="feature">
+        <div class="icon">🔧</div>
+        <h3>Self-Repairing Queries</h3>
+        <p>If a query fails or returns nothing useful, the agent reads the error message, fixes the SQL and retries — up to two attempts — before ever giving up.</p>
+      </div>
+      <div class="feature">
+        <div class="icon">📋</div>
+        <h3>Full Audit Trail</h3>
+        <p>Every question, every generated SQL statement, row count and timing is written to an audit log. Regulators love paper trails. So do we.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 class="sec-title">How it works</h3>
+      <p class="sec-sub">One question travels through five stages before you see an answer.</p>
+      <div class="steps">
+        <div class="step"><div class="n">1</div><div><h4>Intent</h4><p>Understand what you're asking — a business query or small talk.</p></div></div>
+        <div class="step"><div class="n">2</div><div><h4>Schema linking</h4><p>Pick the relevant tables and columns from the ledger.</p></div></div>
+        <div class="step"><div class="n">3</div><div><h4>SQL generation</h4><p>Write one SQLite-dialect SELECT statement.</p></div></div>
+        <div class="step"><div class="n">4</div><div><h4>Guardrails</h4><p>Validate: read-only, whitelisted, row-limited.</p></div></div>
+        <div class="step"><div class="n">5</div><div><h4>Answer</h4><p>Run it and summarize the results in English.</p></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 class="sec-title">Data coverage</h3>
+      <p class="sec-sub">A synthetic but self-consistent Asian trade book — the same shape as a real bank ledger.</p>
+      <div class="grid" id="coverage"></div>
+    </div>
+
+    <div class="card">
+      <h3 class="sec-title">Tech stack</h3>
+      <p class="sec-sub">Boring technology, chosen so every layer can be verified end to end.</p>
+      <div class="badges">
+        <span class="badge">FastAPI</span>
+        <span class="badge">LangGraph</span>
+        <span class="badge">Gemini</span>
+        <span class="badge">SQLite</span>
+        <span class="badge">sqlparse</span>
+        <span class="badge">pytest</span>
+        <span class="badge">Fly.io</span>
+      </div>
+      <div style="margin-top:22px">
+        <button class="btn" data-goto="ask">Try it now</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= DATA ================= -->
+  <section id="tab-data" hidden>
+    <div class="card">
+      <h3 class="sec-title">Browse the ledger</h3>
+      <p class="sec-sub">See exactly what the demo database holds. Pick a table — these are the same five tables the agent queries.</p>
+      <div class="table-picker" id="tablePicker"></div>
+      <div id="dataContent"><div class="loading">Select a table above to preview its rows.</div></div>
+      <p class="hint">Showing up to 50 rows per table (the API default; the maximum is 200). All reads go through the same read-only connection the agent uses.</p>
+    </div>
+  </section>
+
+  <!-- ================= AUDIT ================= -->
+  <section id="tab-audit" hidden>
+    <div class="card">
+      <h3 class="sec-title">Query audit trail</h3>
+      <p class="sec-sub">Every question ever asked on this demo is logged here — the question, the generated SQL, the row count and the timing. This is the paper trail banks ask for before anything goes near production.</p>
+      <div style="margin-bottom:16px">
+        <button class="btn ghost" id="auditRefresh">Refresh</button>
+      </div>
+      <div id="auditContent"><div class="loading">Loading audit records…</div></div>
+    </div>
+  </section>
+
 </main>
 
-<footer class="inputbar">
+<footer class="inputbar" id="inputbar">
   <div class="inner">
     <input id="q" type="text" placeholder="e.g. Which payments are overdue?" autocomplete="off">
     <button id="send">Send</button>
@@ -131,6 +338,74 @@
 </footer>
 
 <script>
+/* ================= shared helpers ================= */
+function esc(s) {
+  return String(s == null ? "" : s)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+function renderTable(columns, rows) {
+  if (!columns || !columns.length) return '<p class="hint">No columns returned.</p>';
+  let h = '<div class="table-wrap"><table class="data"><thead><tr>';
+  columns.forEach(c => { h += "<th>" + esc(prettyCol(c)) + "</th>"; });
+  h += "</tr></thead><tbody>";
+  rows.forEach(r => {
+    h += "<tr>";
+    columns.forEach(c => {
+      const v = r[c];
+      const cls = (typeof v === "number") ? ' class="num"' : "";
+      h += "<td" + cls + ' title="' + esc(v) + '">' + esc(fmtCell(v)) + "</td>";
+    });
+    h += "</tr>";
+  });
+  h += "</tbody></table></div>";
+  h += '<p class="rowcount">' + rows.length + " row(s)</p>";
+  return h;
+}
+
+function prettyCol(c) {
+  return String(c).replace(/_/g, " ").replace(/\b\w/g, ch => ch.toUpperCase());
+}
+
+function fmtCell(v) {
+  if (v === null || v === undefined || v === "") return "—";
+  if (typeof v === "number" && Number.isFinite(v)) {
+    return v % 1 === 0 ? v.toLocaleString("en-US") : v.toLocaleString("en-US", {maximumFractionDigits: 2});
+  }
+  return v;
+}
+
+/* ================= tab navigation ================= */
+const main = document.getElementById("main");
+const inputbar = document.getElementById("inputbar");
+const loaded = { overview: false, data: false, audit: false };
+
+function switchTab(name) {
+  document.querySelectorAll("#tabs button").forEach(b => {
+    b.classList.toggle("active", b.dataset.tab === name);
+  });
+  document.querySelectorAll("main > section").forEach(s => {
+    s.hidden = s.id !== "tab-" + name;
+  });
+  const isAsk = name === "ask";
+  inputbar.hidden = !isAsk;
+  main.classList.toggle("with-inputbar", isAsk);
+  if (name === "overview" && !loaded.overview) { loaded.overview = true; loadCoverage(); }
+  if (name === "data" && !loaded.data) { loaded.data = true; initDataTab(); }
+  if (name === "audit" && !loaded.audit) { loaded.audit = true; loadAudit(); }
+  window.scrollTo({ top: 0 });
+}
+
+document.getElementById("tabs").addEventListener("click", e => {
+  const b = e.target.closest("button[data-tab]");
+  if (b) switchTab(b.dataset.tab);
+});
+document.querySelectorAll("[data-goto]").forEach(b => {
+  b.addEventListener("click", () => switchTab(b.dataset.goto));
+});
+
+/* ================= ASK tab ================= */
 const EXAMPLES = [
   "What is the document status of L/C SCB2026LC001207?",
   "Where is the cargo under B/L COSU6123456780 right now?",
@@ -159,29 +434,8 @@ function addMsg(cls, html) {
   d.className = "msg " + cls;
   d.innerHTML = html;
   msgEl.appendChild(d);
-  d.scrollIntoView({behavior: "smooth", block: "nearest"});
+  d.scrollIntoView({ behavior: "smooth", block: "nearest" });
   return d;
-}
-
-function esc(s) {
-  return String(s == null ? "" : s)
-    .replace(/&/g, "&amp;").replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-}
-
-function renderTable(columns, rows) {
-  if (!columns || !columns.length) return "";
-  let h = '<div class="table-wrap"><table class="data"><thead><tr>';
-  columns.forEach(c => { h += "<th>" + esc(c) + "</th>"; });
-  h += "</tr></thead><tbody>";
-  rows.forEach(r => {
-    h += "<tr>";
-    columns.forEach(c => { h += "<td title=\"" + esc(r[c]) + "\">" + esc(r[c]) + "</td>"; });
-    h += "</tr>";
-  });
-  h += "</tbody></table></div>";
-  h += "<div style='color:#6e6e73;font-size:12px;margin-top:6px'>" + rows.length + " row(s)</div>";
-  return h;
 }
 
 async function send() {
@@ -194,8 +448,8 @@ async function send() {
   try {
     const resp = await fetch("/api/chat", {
       method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({question: q})
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question: q })
     });
     const data = await resp.json();
     typing.remove();
@@ -221,6 +475,130 @@ async function send() {
 
 sendBtn.onclick = send;
 inputEl.addEventListener("keydown", e => { if (e.key === "Enter") send(); });
+
+/* ================= OVERVIEW tab ================= */
+const TABLE_LABELS = {
+  corporates: "Corporates",
+  letters_of_credit: "Letters of Credit",
+  shipments: "Shipments",
+  documents: "Documents",
+  payments: "Payments"
+};
+
+async function loadCoverage() {
+  const el = document.getElementById("coverage");
+  try {
+    const resp = await fetch("/api/schema");
+    const data = await resp.json();
+    const tables = data.tables || {};
+    let h = "";
+    Object.keys(TABLE_LABELS).forEach(t => {
+      const info = tables[t] || {};
+      const ncols = info.columns ? Object.keys(info.columns).length : 0;
+      h += '<div class="feature"><h3>' + esc(TABLE_LABELS[t]) + '</h3><p>' +
+           esc(info.comment || "") + '</p>' +
+           '<p style="margin-top:10px;font-size:12.5px;color:#0071e3;font-weight:600">' +
+           ncols + " columns</p></div>";
+    });
+    el.innerHTML = h;
+  } catch (e) {
+    el.innerHTML = '<p class="hint">Could not load schema from the backend.</p>';
+  }
+}
+
+/* ================= DATA tab ================= */
+const dataContent = document.getElementById("dataContent");
+
+function initDataTab() {
+  const picker = document.getElementById("tablePicker");
+  Object.keys(TABLE_LABELS).forEach((t, i) => {
+    const b = document.createElement("button");
+    b.textContent = TABLE_LABELS[t];
+    b.dataset.table = t;
+    if (i === 0) b.classList.add("active");
+    b.onclick = () => {
+      picker.querySelectorAll("button").forEach(x => x.classList.remove("active"));
+      b.classList.add("active");
+      loadTable(t);
+    };
+    picker.appendChild(b);
+  });
+  loadTable("corporates");
+}
+
+async function loadTable(t) {
+  dataContent.innerHTML = '<div class="loading">Loading ' + esc(TABLE_LABELS[t]) + '…</div>';
+  try {
+    const resp = await fetch("/api/tables/" + encodeURIComponent(t));
+    if (!resp.ok) throw new Error("HTTP " + resp.status);
+    const data = await resp.json();
+    dataContent.innerHTML = "<h4 style='margin:0 0 4px'>" + esc(TABLE_LABELS[t]) + "</h4>" +
+      renderTable(data.columns, data.rows);
+  } catch (e) {
+    dataContent.innerHTML = '<p class="err">Failed to load table: ' + esc(e.message) + "</p>";
+  }
+}
+
+/* ================= AUDIT tab ================= */
+const auditContent = document.getElementById("auditContent");
+document.getElementById("auditRefresh").onclick = loadAudit;
+
+function fmtTime(ts) {
+  try {
+    const d = new Date(ts);
+    if (isNaN(d)) return ts;
+    return d.toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false });
+  } catch (e) { return ts; }
+}
+
+function truncSql(sql, id) {
+  const s = sql || "";
+  if (s.length <= 90) return '<span class="sql-cell">' + esc(s) + "</span>";
+  return '<span class="sql-cell">' + esc(s.slice(0, 90)) + "…</span> " +
+    '<button class="toggle-sql" data-sqlid="' + id + '">expand</button>' +
+    '<span class="sql-cell" id="fullsql-' + id + '" hidden><br>' + esc(s) + "</span>";
+}
+
+async function loadAudit() {
+  auditContent.innerHTML = '<div class="loading">Loading audit records…</div>';
+  try {
+    const resp = await fetch("/api/audit?limit=50");
+    if (!resp.ok) throw new Error("HTTP " + resp.status);
+    const records = await resp.json();
+    if (!records.length) {
+      auditContent.innerHTML = '<p class="hint">No queries logged yet. Ask something in the Ask tab first.</p>';
+      return;
+    }
+    let h = '<div class="table-wrap"><table class="data"><thead><tr>' +
+      "<th>Time</th><th>Question</th><th>SQL</th><th>Rows</th><th>Elapsed</th><th>Status</th>" +
+      "</tr></thead><tbody>";
+    records.forEach((r, i) => {
+      const ok = !r.has_error;
+      const ms = (r.elapsed_ms == null) ? "—" : (Math.round(r.elapsed_ms) + " ms");
+      h += "<tr>" +
+        "<td style='white-space:nowrap'>" + esc(fmtTime(r.ts)) + "</td>" +
+        "<td style='white-space:normal;min-width:180px'>" + esc(r.question) + "</td>" +
+        "<td style='white-space:normal;min-width:200px'>" + truncSql(r.sql_text, i) + "</td>" +
+        '<td class="num">' + esc(r.row_count == null ? "—" : r.row_count) + "</td>" +
+        "<td style='white-space:nowrap'>" + esc(ms) + "</td>" +
+        '<td><span class="pill ' + (ok ? "ok" : "bad") + '">' + (ok ? "OK" : "Error") + "</span></td>" +
+        "</tr>";
+    });
+    h += "</tbody></table></div>";
+    h += '<p class="rowcount">' + records.length + " record(s), newest first</p>";
+    auditContent.innerHTML = h;
+    auditContent.querySelectorAll(".toggle-sql").forEach(b => {
+      b.onclick = () => {
+        const full = document.getElementById("fullsql-" + b.dataset.sqlid);
+        const open = full.hidden;
+        full.hidden = !open;
+        b.textContent = open ? "collapse" : "expand";
+      };
+    });
+  } catch (e) {
+    auditContent.innerHTML = '<p class="err">Failed to load audit records: ' + esc(e.message) + "</p>";
+  }
+}
 </script>
 </body>
 </html>
