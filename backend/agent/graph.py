@@ -13,6 +13,7 @@ from langgraph.graph import END, StateGraph
 from . import config
 from backend.db.db import execute_sql, get_sql_dialect
 from .guardrail import GuardrailError, validate_and_fix
+from .retrieval import prefilter_tables
 from .schema_catalog import (
     DIALECT_DATE,
     SCHEMA_CATALOG,
@@ -109,11 +110,14 @@ def n_chat_answer(state: AgentState) -> AgentState:
 
 def n_schema_linking(state: AgentState) -> AgentState:
     q = state["question"]
+    # 表很多时先做检索预筛（RAG-for-Text2SQL）；表少时返回 None，走全量 schema。
+    candidates = prefilter_tables(q)
+    scope = candidates or list(SCHEMA_CATALOG.keys())
     if _lang() == "zh":
         prompt = (
             "[SCHEMA] 表选择\n"
             "下面是银行贸易金融数据库的表结构（表名列名为英文，附英文说明）：\n"
-            f"\n{format_schema()}\n"
+            f"\n{format_schema(scope)}\n"
             f"\n用户问题：{q}\n"
             "\n选出回答该问题需要的表，只输出 JSON 数组，如 [\"letters_of_credit\", \"payments\"]，不要输出其他文字。"
         )
@@ -122,7 +126,7 @@ def n_schema_linking(state: AgentState) -> AgentState:
             "[SCHEMA] Table selection\n"
             "Below is the schema of the bank trade-finance database "
             "(table and column names are in English, with English descriptions):\n"
-            f"\n{format_schema()}\n"
+            f"\n{format_schema(scope)}\n"
             f"\nUser question: {q}\n"
             "\nSelect the tables needed to answer the question and output only a JSON array, "
             "e.g. [\"letters_of_credit\", \"payments\"], with no other text."
@@ -131,11 +135,11 @@ def n_schema_linking(state: AgentState) -> AgentState:
         out = _ask(prompt).strip()
         m = re.search(r"\[.*?\]", out, re.S)
         tables = json.loads(m.group(0)) if m else []
-        tables = [t for t in tables if t in SCHEMA_CATALOG]
+        tables = [t for t in tables if t in scope]
     except Exception:  # noqa: BLE001
         tables = []
     if not tables:
-        tables = list(SCHEMA_CATALOG.keys())
+        tables = scope
     return {"relevant_tables": tables}
 
 
