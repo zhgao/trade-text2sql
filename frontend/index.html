@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TradeQuery – Trade Finance Intelligence</title>
+<style>
+  :root {
+    --bg: #f5f5f7;
+    --card: #ffffff;
+    --text: #1d1d1f;
+    --sub: #6e6e73;
+    --blue: #0071e3;
+    --blue-dark: #0060c9;
+    --border: #e8e8ed;
+    --radius: 18px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+  }
+  header {
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 10;
+  }
+  header .inner {
+    max-width: 860px; margin: 0 auto; padding: 16px 24px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .logo {
+    width: 38px; height: 38px; border-radius: 11px;
+    background: linear-gradient(135deg, #0071e3, #42a5f5);
+    color: #fff; font-weight: 700; font-size: 20px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  header h1 { font-size: 20px; margin: 0; font-weight: 600; letter-spacing: 0.2px; }
+  header p { margin: 2px 0 0; font-size: 13px; color: var(--sub); }
+  main { max-width: 860px; margin: 0 auto; padding: 24px 24px 140px; }
+  .hero {
+    background: var(--card); border-radius: var(--radius);
+    padding: 28px; margin-bottom: 20px; border: 1px solid var(--border);
+  }
+  .hero h2 { margin: 0 0 6px; font-size: 24px; font-weight: 600; }
+  .hero p { margin: 0 0 16px; color: var(--sub); font-size: 15px; line-height: 1.6; }
+  .chips { display: flex; flex-wrap: wrap; gap: 10px; }
+  .chip {
+    background: #eef4fc; color: var(--blue); border: 1px solid #d6e6fa;
+    border-radius: 999px; padding: 9px 16px; font-size: 14px; cursor: pointer;
+    transition: all .15s ease;
+  }
+  .chip:hover { background: var(--blue); color: #fff; border-color: var(--blue); }
+  #messages { display: flex; flex-direction: column; gap: 14px; }
+  .msg {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 18px 20px; max-width: 100%;
+    animation: fade .25s ease;
+  }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px);} to { opacity: 1; transform: none;} }
+  .msg.user { align-self: flex-end; background: var(--blue); color: #fff; border: none; max-width: 80%; }
+  .msg.ai { align-self: flex-start; width: 100%; }
+  .msg .answer { font-size: 15px; line-height: 1.75; white-space: pre-wrap; }
+  .msg details { margin-top: 12px; font-size: 13px; }
+  .msg summary { cursor: pointer; color: var(--blue); font-weight: 500; }
+  .msg pre {
+    background: #f5f5f7; border-radius: 10px; padding: 12px 14px;
+    overflow-x: auto; font-size: 12.5px; line-height: 1.6; margin: 8px 0 0;
+  }
+  table.data { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 13.5px; }
+  table.data th, table.data td {
+    border: 1px solid var(--border); padding: 8px 10px; text-align: left;
+  }
+  table.data th { background: #f5f5f7; font-weight: 600; white-space: nowrap; }
+  table.data td { white-space: nowrap; max-width: 260px; overflow: hidden; text-overflow: ellipsis; }
+  .table-wrap { overflow-x: auto; }
+  .err { color: #b00020; font-size: 13px; margin-top: 8px; }
+  .typing { color: var(--sub); font-size: 14px; }
+  .typing .dot { animation: blink 1.2s infinite; }
+  @keyframes blink { 0%,100% {opacity:.2;} 50% {opacity:1;} }
+  footer.inputbar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: rgba(255,255,255,0.9); backdrop-filter: blur(12px);
+    border-top: 1px solid var(--border); padding: 14px 24px calc(14px + env(safe-area-inset-bottom));
+  }
+  .inputbar .inner { max-width: 860px; margin: 0 auto; display: flex; gap: 10px; }
+  #q {
+    flex: 1; border: 1px solid var(--border); border-radius: 999px;
+    padding: 13px 20px; font-size: 15px; outline: none; background: #fff;
+  }
+  #q:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(0,113,227,.12); }
+  #send {
+    border: none; border-radius: 999px; background: var(--blue); color: #fff;
+    padding: 0 26px; font-size: 15px; font-weight: 600; cursor: pointer;
+  }
+  #send:hover { background: var(--blue-dark); }
+  #send:disabled { opacity: .5; cursor: default; }
+</style>
+</head>
+<body>
+<header>
+  <div class="inner">
+    <div class="logo">TQ</div>
+    <div>
+      <h1>TradeQuery – Trade Finance Intelligence</h1>
+      <p>Letters of Credit · Cargo Tracking · Documents · Payments — the full trade lifecycle in one question</p>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="hero">
+    <h2>Ask in plain English, query bank trade data</h2>
+    <p>Try a sample question below — click to send. Your question is converted into SQL against the demo ledger, and the answer is summarized in English.</p>
+    <div class="chips" id="chips"></div>
+  </div>
+  <div id="messages"></div>
+</main>
+
+<footer class="inputbar">
+  <div class="inner">
+    <input id="q" type="text" placeholder="e.g. Which payments are overdue?" autocomplete="off">
+    <button id="send">Send</button>
+  </div>
+</footer>
+
+<script>
+const EXAMPLES = [
+  "What is the document status of L/C SCB2026LC001207?",
+  "Where is the cargo under B/L COSU6123456780 right now?",
+  "Which payments are overdue?",
+  "Which letters of credit expire in the next 30 days?",
+  "What is the total L/C amount for Shanghai Huamao (\u4e0a\u6d77\u534e\u8d38\u8fdb\u51fa\u53e3\u6709\u9650\u516c\u53f8)?",
+  "Which letters of credit does Shenzhen Hengxin (\u6df1\u5733\u6052\u4fe1\u7535\u5b50\u79d1\u6280\u6709\u9650\u516c\u53f8) hold?",
+  "What is the shipment status of L/C SCB2026LC001213?"
+];
+
+const chipsEl = document.getElementById("chips");
+const msgEl = document.getElementById("messages");
+const inputEl = document.getElementById("q");
+const sendBtn = document.getElementById("send");
+
+EXAMPLES.forEach(q => {
+  const b = document.createElement("button");
+  b.className = "chip";
+  b.textContent = q;
+  b.onclick = () => { inputEl.value = q; send(); };
+  chipsEl.appendChild(b);
+});
+
+function addMsg(cls, html) {
+  const d = document.createElement("div");
+  d.className = "msg " + cls;
+  d.innerHTML = html;
+  msgEl.appendChild(d);
+  d.scrollIntoView({behavior: "smooth", block: "nearest"});
+  return d;
+}
+
+function esc(s) {
+  return String(s == null ? "" : s)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+function renderTable(columns, rows) {
+  if (!columns || !columns.length) return "";
+  let h = '<div class="table-wrap"><table class="data"><thead><tr>';
+  columns.forEach(c => { h += "<th>" + esc(c) + "</th>"; });
+  h += "</tr></thead><tbody>";
+  rows.forEach(r => {
+    h += "<tr>";
+    columns.forEach(c => { h += "<td title=\"" + esc(r[c]) + "\">" + esc(r[c]) + "</td>"; });
+    h += "</tr>";
+  });
+  h += "</tbody></table></div>";
+  h += "<div style='color:#6e6e73;font-size:12px;margin-top:6px'>" + rows.length + " row(s)</div>";
+  return h;
+}
+
+async function send() {
+  const q = inputEl.value.trim();
+  if (!q) return;
+  inputEl.value = "";
+  addMsg("user", esc(q));
+  sendBtn.disabled = true;
+  const typing = addMsg("ai", '<div class="typing">Querying<span class="dot">…</span></div>');
+  try {
+    const resp = await fetch("/api/chat", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({question: q})
+    });
+    const data = await resp.json();
+    typing.remove();
+    let html = '<div class="answer">' + esc(data.answer || "") + "</div>";
+    if (data.rows && data.rows.length) {
+      html += renderTable(data.columns, data.rows);
+    }
+    if (data.sql) {
+      html += "<details><summary>View generated SQL</summary><pre>" + esc(data.sql) + "</pre></details>";
+    }
+    if (data.error) {
+      html += '<div class="err">Note: ' + esc(data.error) + "</div>";
+    }
+    addMsg("ai", html);
+  } catch (e) {
+    typing.remove();
+    addMsg("ai", '<div class="answer">Network request failed. Please make sure the backend service is running.</div><div class="err">' + esc(e.message) + "</div>");
+  } finally {
+    sendBtn.disabled = false;
+    inputEl.focus();
+  }
+}
+
+sendBtn.onclick = send;
+inputEl.addEventListener("keydown", e => { if (e.key === "Enter") send(); });
+</script>
+</body>
+</html>

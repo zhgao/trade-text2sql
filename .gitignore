@@ -1,0 +1,6 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+backend/db/trade.db
+.pytest_cache/
