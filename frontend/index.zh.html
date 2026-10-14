@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TradeQuery 贸易金融智能查询</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<style>
+  :root {
+    --bg: #f5f5f7;
+    --card: #ffffff;
+    --text: #1d1d1f;
+    --sub: #6e6e73;
+    --blue: #0071e3;
+    --blue-dark: #0060c9;
+    --border: #e8e8ed;
+    --radius: 18px;
+    --green: #1a7f37;
+    --green-bg: #e6f4ea;
+    --red: #b00020;
+    --red-bg: #fdecea;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+  }
+  /* ---------- header + tabs ---------- */
+  header {
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 10;
+  }
+  header .inner {
+    max-width: 1020px; margin: 0 auto; padding: 14px 24px;
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  }
+  .logo {
+    width: 38px; height: 38px; border-radius: 11px; flex: none;
+    background: linear-gradient(135deg, #0071e3, #42a5f5);
+    color: #fff; font-weight: 700; font-size: 20px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .brand h1 { font-size: 19px; margin: 0; font-weight: 600; letter-spacing: 0.2px; }
+  .brand p { margin: 2px 0 0; font-size: 12.5px; color: var(--sub); }
+  .tabs {
+    margin-left: auto; display: flex; gap: 2px; flex: none;
+    background: #ececf0; border-radius: 999px; padding: 3px;
+    max-width: 100%; overflow-x: auto;
+  }
+  .tabs button {
+    border: none; background: transparent; border-radius: 999px;
+    padding: 8px 20px; font-size: 14px; font-weight: 500; color: var(--sub);
+    cursor: pointer; white-space: nowrap; transition: all .15s ease;
+  }
+  .tabs button:hover { color: var(--text); }
+  .tabs button.active {
+    background: #fff; color: var(--text); font-weight: 600;
+    box-shadow: 0 1px 4px rgba(0,0,0,.12);
+  }
+  /* ---------- layout ---------- */
+  main { max-width: 1020px; margin: 0 auto; padding: 28px 24px 48px; }
+  main.with-inputbar { padding-bottom: 150px; }
+  section[hidden] { display: none; }
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 28px; margin-bottom: 20px;
+  }
+  .eyebrow {
+    font-size: 12px; font-weight: 700; letter-spacing: 1.5px;
+    color: var(--blue); text-transform: uppercase; margin: 0 0 12px;
+  }
+  h2.big { font-size: 34px; font-weight: 700; letter-spacing: -0.5px; margin: 0 0 12px; line-height: 1.2; }
+  .lede { font-size: 17px; color: var(--sub); line-height: 1.65; margin: 0 0 22px; max-width: 720px; }
+  .btn {
+    display: inline-block; border: none; border-radius: 999px; cursor: pointer;
+    background: var(--blue); color: #fff; font-size: 15px; font-weight: 600;
+    padding: 12px 28px; margin-right: 10px; text-decoration: none;
+  }
+  .btn:hover { background: var(--blue-dark); }
+  .btn.ghost { background: #eef4fc; color: var(--blue); border: 1px solid #d6e6fa; }
+  .btn.ghost:hover { background: #e0edfb; }
+  /* ---------- feature grid ---------- */
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+  .feature {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 22px;
+  }
+  .feature .icon { font-size: 26px; margin-bottom: 10px; }
+  .feature h3 { margin: 0 0 8px; font-size: 16px; font-weight: 600; }
+  .feature p { margin: 0; font-size: 14px; color: var(--sub); line-height: 1.6; }
+  /* ---------- steps ---------- */
+  .steps { display: flex; align-items: stretch; gap: 0; overflow-x: auto; padding-bottom: 4px; }
+  .step { flex: 1 0 150px; text-align: center; padding: 0 8px; position: relative; }
+  .step .n {
+    width: 36px; height: 36px; border-radius: 50%; margin: 0 auto 10px;
+    background: var(--blue); color: #fff; font-weight: 700; font-size: 15px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .step h4 { margin: 0 0 6px; font-size: 14px; }
+  .step p { margin: 0; font-size: 12.5px; color: var(--sub); line-height: 1.5; }
+  .step:not(:last-child)::after {
+    content: "→"; position: absolute; right: -8px; top: 8px;
+    color: #c7c7cc; font-size: 18px;
+  }
+  /* ---------- badges ---------- */
+  .badges { display: flex; flex-wrap: wrap; gap: 10px; }
+  .badge {
+    background: #f5f5f7; border: 1px solid var(--border); border-radius: 999px;
+    padding: 8px 18px; font-size: 14px; font-weight: 500;
+  }
+  /* ---------- Ask tab ---------- */
+  .hero h2 { margin: 0 0 6px; font-size: 24px; font-weight: 600; }
+  .hero p { margin: 0 0 16px; color: var(--sub); font-size: 15px; line-height: 1.6; }
+  .chips { display: flex; flex-wrap: wrap; gap: 10px; }
+  .chip {
+    background: #eef4fc; color: var(--blue); border: 1px solid #d6e6fa;
+    border-radius: 999px; padding: 9px 16px; font-size: 14px; cursor: pointer;
+    transition: all .15s ease;
+  }
+  .chip:hover { background: var(--blue); color: #fff; border-color: var(--blue); }
+  #messages { display: flex; flex-direction: column; gap: 14px; margin-top: 20px; }
+  .msg {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 18px 20px; max-width: 100%;
+    animation: fade .25s ease;
+  }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px);} to { opacity: 1; transform: none;} }
+  .msg.user { align-self: flex-end; background: var(--blue); color: #fff; border: none; max-width: 80%; }
+  .msg.ai { align-self: flex-start; width: 100%; }
+  .msg .answer { font-size: 15px; line-height: 1.75; white-space: pre-wrap; }
+  .msg details { margin-top: 12px; font-size: 13px; }
+  .msg summary { cursor: pointer; color: var(--blue); font-weight: 500; }
+  .msg pre {
+    background: #f5f5f7; border-radius: 10px; padding: 12px 14px;
+    overflow-x: auto; font-size: 12.5px; line-height: 1.6; margin: 8px 0 0;
+    white-space: pre-wrap; word-break: break-all;
+  }
+  table.data { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 13.5px; }
+  table.data th, table.data td {
+    border: 1px solid var(--border); padding: 8px 10px; text-align: left;
+  }
+  table.data th { background: #f5f5f7; font-weight: 600; white-space: nowrap; }
+  table.data td { max-width: 260px; overflow: hidden; text-overflow: ellipsis; }
+  table.data td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .table-wrap { overflow-x: auto; }
+  .rowcount { color: var(--sub); font-size: 12px; margin-top: 6px; }
+  .err { color: var(--red); font-size: 13px; margin-top: 8px; }
+  .typing { color: var(--sub); font-size: 14px; }
+  .typing .dot { animation: blink 1.2s infinite; }
+  @keyframes blink { 0%,100% {opacity:.2;} 50% {opacity:1;} }
+  footer.inputbar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: rgba(255,255,255,0.9); backdrop-filter: blur(12px);
+    border-top: 1px solid var(--border); padding: 14px 24px calc(14px + env(safe-area-inset-bottom));
+  }
+  footer.inputbar[hidden] { display: none; }
+  .inputbar .inner { max-width: 1020px; margin: 0 auto; display: flex; gap: 10px; }
+  #q {
+    flex: 1; border: 1px solid var(--border); border-radius: 999px;
+    padding: 13px 20px; font-size: 15px; outline: none; background: #fff; min-width: 0;
+  }
+  #q:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(0,113,227,.12); }
+  #send {
+    border: none; border-radius: 999px; background: var(--blue); color: #fff;
+    padding: 0 26px; font-size: 15px; font-weight: 600; cursor: pointer; flex: none;
+  }
+  #send:hover { background: var(--blue-dark); }
+  #send:disabled { opacity: .5; cursor: default; }
+  /* ---------- Data / Audit tabs ---------- */
+  .table-picker { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
+  .table-picker button {
+    border: 1px solid var(--border); background: var(--card); border-radius: 999px;
+    padding: 9px 18px; font-size: 14px; cursor: pointer; color: var(--text);
+  }
+  .table-picker button.active { background: var(--text); color: #fff; border-color: var(--text); }
+  .hint { font-size: 13px; color: var(--sub); margin: 10px 0 0; line-height: 1.6; }
+  .pill {
+    display: inline-block; border-radius: 999px; padding: 3px 12px;
+    font-size: 12px; font-weight: 600;
+  }
+  .pill.ok { background: var(--green-bg); color: var(--green); }
+  .pill.bad { background: var(--red-bg); color: var(--red); }
+  .sql-cell { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+  .toggle-sql { color: var(--blue); cursor: pointer; font-size: 12px; font-weight: 500; background: none; border: none; padding: 0; }
+  .loading { color: var(--sub); font-size: 14px; padding: 24px 0; text-align: center; }
+  .sec-title { font-size: 22px; font-weight: 700; margin: 0 0 6px; letter-spacing: -0.3px; }
+  .sec-sub { color: var(--sub); font-size: 14.5px; line-height: 1.65; margin: 0 0 20px; max-width: 760px; }
+  @media (max-width: 640px) {
+    header .inner { padding: 12px 16px; gap: 10px; }
+    .brand p { display: none; }
+    .tabs { margin-left: 0; width: 100%; }
+    .tabs button { padding: 8px 14px; font-size: 13px; flex: 1; }
+    main { padding: 20px 16px 40px; }
+    h2.big { font-size: 27px; }
+    .step:not(:last-child)::after { display: none; }
+    .steps { flex-direction: column; gap: 14px; }
+    .step { text-align: left; display: flex; gap: 12px; align-items: flex-start; }
+    .step .n { margin: 0; flex: none; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="inner">
+    <div class="logo">TQ</div>
+    <div class="brand">
+      <h1>TradeQuery</h1>
+      <p>贸易金融智能查询 — 信用证 · 货物 · 单据 · 付款</p>
+    </div>
+    <nav class="tabs" id="tabs">
+      <button data-tab="ask" class="active">提问</button>
+      <button data-tab="overview">产品介绍</button>
+      <button data-tab="data">数据浏览</button>
+      <button data-tab="audit">审计</button>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="with-inputbar">
+
+  <!-- ================= ASK ================= -->
+  <section id="tab-ask">
+    <div class="card hero">
+      <h2>用中文提问，查询银行贸易数据</h2>
+      <p>点击下方示例问题直接发送。你的问题会被转换成 SQL 在演示账本上执行，并用中文给出总结。</p>
+      <div class="chips" id="chips"></div>
+    </div>
+    <div id="messages"></div>
+  </section>
+
+  <!-- ================= OVERVIEW ================= -->
+  <section id="tab-overview" hidden>
+    <div class="card">
+      <p class="eyebrow">贸易金融 · Text-to-SQL</p>
+      <h2 class="big">把贸易问题变成答案。</h2>
+      <p class="lede">TradeQuery 让银行从业者用中文查询贸易全链路——信用证、货物动态、单据、付款，无需会写 SQL。每条查询都经过银行级护栏校验，并写入完整审计日志。</p>
+      <div>
+        <button class="btn" data-goto="ask">立即试用</button>
+        <button class="btn ghost" data-goto="data">浏览数据</button>
+      </div>
+    </div>
+
+    <div class="grid" style="margin-bottom:20px">
+      <div class="feature">
+        <div class="icon">💬</div>
+        <h3>自然语言 → SQL</h3>
+        <p>像跟同事说话一样提问。Agent 会把问题关联到正确的表，借助专为贸易金融调优的示例写出正确的 SQL。</p>
+      </div>
+      <div class="feature">
+        <div class="icon">🛡️</div>
+        <h3>银行级护栏</h3>
+        <p>每条生成的 SQL 都要过五道确定性检查——单语句、只读、白名单表、禁用关键字、行数限制。数据库本身以只读方式打开。</p>
+      </div>
+      <div class="feature">
+        <div class="icon">🔧</div>
+        <h3>查询自修复</h3>
+        <p>如果 SQL 执行失败或结果可疑，Agent 会读懂报错、修正 SQL 并重试——最多两次，绝不轻易放弃。</p>
+      </div>
+      <div class="feature">
+        <div class="icon">📋</div>
+        <h3>完整审计链</h3>
+        <p>每个问题、每条生成的 SQL、返回行数和耗时都会写入审计日志。监管要的纸面留痕，我们天生就有。</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 class="sec-title">工作原理</h3>
+      <p class="sec-sub">一个问题经过五个阶段，才变成你看到的答案。</p>
+      <div class="steps">
+        <div class="step"><div class="n">1</div><div><h4>意图理解</h4><p>判断你在问什么——是业务查询还是闲聊。</p></div></div>
+        <div class="step"><div class="n">2</div><div><h4>表关联</h4><p>从账本里挑出相关的表和列。</p></div></div>
+        <div class="step"><div class="n">3</div><div><h4>SQL 生成</h4><p>写一条对应方言的 SELECT 语句。</p></div></div>
+        <div class="step"><div class="n">4</div><div><h4>护栏校验</h4><p>校验：只读、白名单、行数限制。</p></div></div>
+        <div class="step"><div class="n">5</div><div><h4>生成回答</h4><p>执行并用中文总结结果。</p></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 class="sec-title">数据覆盖</h3>
+      <p class="sec-sub">一套虚构但自洽的亚洲贸易账本——结构与真实银行账本一致。</p>
+      <div class="grid" id="coverage"></div>
+    </div>
+
+    <div class="card">
+      <h3 class="sec-title">技术栈</h3>
+      <p class="sec-sub">无聊但可靠的技术选型，每一层都可端到端验证。</p>
+      <div class="badges">
+        <span class="badge">FastAPI</span>
+        <span class="badge">LangGraph</span>
+        <span class="badge">Gemini</span>
+        <span class="badge">SQLite / PostgreSQL / MySQL</span>
+        <span class="badge">sqlparse</span>
+        <span class="badge">pytest</span>
+        <span class="badge">Fly.io</span>
+      </div>
+      <div style="margin-top:22px">
+        <button class="btn" data-goto="ask">立即试用</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= DATA ================= -->
+  <section id="tab-data" hidden>
+    <div class="card">
+      <h3 class="sec-title">浏览账本</h3>
+      <p class="sec-sub">看看演示数据库里到底有什么。选一张表——Agent 查询的正是这五张表。</p>
+      <div class="table-picker" id="tablePicker"></div>
+      <div id="dataContent"><div class="loading">在上方选择一张表预览数据。</div></div>
+      <p class="hint">每张表默认展示 50 行（API 默认值，最大 200 行）。所有读取走的都是 Agent 用的同一个只读连接。</p>
+    </div>
+  </section>
+
+  <!-- ================= AUDIT ================= -->
+  <section id="tab-audit" hidden>
+    <div class="card">
+      <h3 class="sec-title">查询审计</h3>
+      <p class="sec-sub">在这个演示站上问过的每一个问题都会记在这里——问题原文、生成的 SQL、返回行数和耗时。银行在上线前要看的纸面留痕，就是这个。</p>
+      <div style="margin-bottom:16px">
+        <button class="btn ghost" id="auditRefresh">刷新</button>
+      </div>
+      <div id="auditContent"><div class="loading">正在加载审计记录…</div></div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="inputbar" id="inputbar">
+  <div class="inner">
+    <input id="q" type="text" placeholder="例如：有哪些逾期未付的款项？" autocomplete="off">
+    <button id="send">发送</button>
+  </div>
+</footer>
+
+<script>
+/* ================= shared helpers ================= */
+function esc(s) {
+  return String(s == null ? "" : s)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+function renderTable(columns, rows) {
+  if (!columns || !columns.length) return '<p class="hint">没有返回任何列。</p>';
+  let h = '<div class="table-wrap"><table class="data"><thead><tr>';
+  columns.forEach(c => { h += "<th>" + esc(prettyCol(c)) + "</th>"; });
+  h += "</tr></thead><tbody>";
+  rows.forEach(r => {
+    h += "<tr>";
+    columns.forEach(c => {
+      const v = r[c];
+      const cls = (typeof v === "number") ? ' class="num"' : "";
+      h += "<td" + cls + ' title="' + esc(v) + '">' + esc(fmtCell(v)) + "</td>";
+    });
+    h += "</tr>";
+  });
+  h += "</tbody></table></div>";
+  h += '<p class="rowcount">' + rows.length + " 条记录</p>";
+  return h;
+}
+
+function prettyCol(c) {
+  return String(c).replace(/_/g, " ").replace(/\b\w/g, ch => ch.toUpperCase());
+}
+
+function fmtCell(v) {
+  if (v === null || v === undefined || v === "") return "—";
+  if (typeof v === "number" && Number.isFinite(v)) {
+    return v % 1 === 0 ? v.toLocaleString("zh-CN") : v.toLocaleString("zh-CN", {maximumFractionDigits: 2});
+  }
+  return v;
+}
+
+/* ================= tab navigation ================= */
+const main = document.getElementById("main");
+const inputbar = document.getElementById("inputbar");
+const loaded = { overview: false, data: false, audit: false };
+
+function switchTab(name) {
+  document.querySelectorAll("#tabs button").forEach(b => {
+    b.classList.toggle("active", b.dataset.tab === name);
+  });
+  document.querySelectorAll("main > section").forEach(s => {
+    s.hidden = s.id !== "tab-" + name;
+  });
+  const isAsk = name === "ask";
+  inputbar.hidden = !isAsk;
+  main.classList.toggle("with-inputbar", isAsk);
+  if (name === "overview" && !loaded.overview) { loaded.overview = true; loadCoverage(); }
+  if (name === "data" && !loaded.data) { loaded.data = true; initDataTab(); }
+  if (name === "audit" && !loaded.audit) { loaded.audit = true; loadAudit(); }
+  window.scrollTo({ top: 0 });
+}
+
+document.getElementById("tabs").addEventListener("click", e => {
+  const b = e.target.closest("button[data-tab]");
+  if (b) switchTab(b.dataset.tab);
+});
+document.querySelectorAll("[data-goto]").forEach(b => {
+  b.addEventListener("click", () => switchTab(b.dataset.goto));
+});
+
+/* ================= ASK tab ================= */
+const EXAMPLES = [
+  "信用证 SCB2026LC001207 的单据状态如何？",
+  "提单号 COSU6123456780 的货物现在在哪里？",
+  "有哪些逾期未付的款项？",
+  "未来30天内有哪些信用证要到期？",
+  "上海华贸进出口有限公司的信用证总额是多少？",
+  "深圳恒信电子科技有限公司有哪些信用证？",
+  "信用证 SCB2026LC001213 的发运状态如何？"
+];
+
+const chipsEl = document.getElementById("chips");
+const msgEl = document.getElementById("messages");
+const inputEl = document.getElementById("q");
+const sendBtn = document.getElementById("send");
+
+EXAMPLES.forEach(q => {
+  const b = document.createElement("button");
+  b.className = "chip";
+  b.textContent = q;
+  b.onclick = () => { inputEl.value = q; send(); };
+  chipsEl.appendChild(b);
+});
+
+function addMsg(cls, html) {
+  const d = document.createElement("div");
+  d.className = "msg " + cls;
+  d.innerHTML = html;
+  msgEl.appendChild(d);
+  d.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  return d;
+}
+
+async function send() {
+  const q = inputEl.value.trim();
+  if (!q) return;
+  inputEl.value = "";
+  addMsg("user", esc(q));
+  sendBtn.disabled = true;
+  const typing = addMsg("ai", '<div class="typing">查询中<span class="dot">…</span></div>');
+  try {
+    const resp = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question: q })
+    });
+    const data = await resp.json();
+    typing.remove();
+    let html = '<div class="answer">' + esc(data.answer || "") + "</div>";
+    if (data.rows && data.rows.length) {
+      html += renderTable(data.columns, data.rows);
+    }
+    if (data.sql) {
+      html += "<details><summary>查看生成的 SQL</summary><pre>" + esc(data.sql) + "</pre></details>";
+    }
+    if (data.error) {
+      html += '<div class="err">提示：' + esc(data.error) + "</div>";
+    }
+    addMsg("ai", html);
+  } catch (e) {
+    typing.remove();
+    addMsg("ai", '<div class="answer">网络请求失败，请确认后端服务正在运行。</div><div class="err">' + esc(e.message) + "</div>");
+  } finally {
+    sendBtn.disabled = false;
+    inputEl.focus();
+  }
+}
+
+sendBtn.onclick = send;
+inputEl.addEventListener("keydown", e => { if (e.key === "Enter") send(); });
+
+/* ================= OVERVIEW tab ================= */
+const TABLE_LABELS = {
+  corporates: "企业客户",
+  letters_of_credit: "信用证",
+  shipments: "发运记录",
+  documents: "单据",
+  payments: "付款"
+};
+
+async function loadCoverage() {
+  const el = document.getElementById("coverage");
+  try {
+    const resp = await fetch("/api/schema");
+    const data = await resp.json();
+    const tables = data.tables || {};
+    let h = "";
+    Object.keys(TABLE_LABELS).forEach(t => {
+      const info = tables[t] || {};
+      const ncols = info.columns ? Object.keys(info.columns).length : 0;
+      h += '<div class="feature"><h3>' + esc(TABLE_LABELS[t]) + '</h3><p>' +
+           esc(info.comment || "") + '</p>' +
+           '<p style="margin-top:10px;font-size:12.5px;color:#0071e3;font-weight:600">' +
+           ncols + " 列</p></div>";
+    });
+    el.innerHTML = h;
+  } catch (e) {
+    el.innerHTML = '<p class="hint">无法从后端加载表结构。</p>';
+  }
+}
+
+/* ================= DATA tab ================= */
+const dataContent = document.getElementById("dataContent");
+
+function initDataTab() {
+  const picker = document.getElementById("tablePicker");
+  Object.keys(TABLE_LABELS).forEach((t, i) => {
+    const b = document.createElement("button");
+    b.textContent = TABLE_LABELS[t];
+    b.dataset.table = t;
+    if (i === 0) b.classList.add("active");
+    b.onclick = () => {
+      picker.querySelectorAll("button").forEach(x => x.classList.remove("active"));
+      b.classList.add("active");
+      loadTable(t);
+    };
+    picker.appendChild(b);
+  });
+  loadTable("corporates");
+}
+
+async function loadTable(t) {
+  dataContent.innerHTML = '<div class="loading">正在加载' + esc(TABLE_LABELS[t]) + '…</div>';
+  try {
+    const resp = await fetch("/api/tables/" + encodeURIComponent(t));
+    if (!resp.ok) throw new Error("HTTP " + resp.status);
+    const data = await resp.json();
+    dataContent.innerHTML = "<h4 style='margin:0 0 4px'>" + esc(TABLE_LABELS[t]) + "</h4>" +
+      renderTable(data.columns, data.rows);
+  } catch (e) {
+    dataContent.innerHTML = '<p class="err">加载表格失败：' + esc(e.message) + "</p>";
+  }
+}
+
+/* ================= AUDIT tab ================= */
+const auditContent = document.getElementById("auditContent");
+document.getElementById("auditRefresh").onclick = loadAudit;
+
+function fmtTime(ts) {
+  try {
+    const d = new Date(ts);
+    if (isNaN(d)) return ts;
+    return d.toLocaleString("zh-CN", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false });
+  } catch (e) { return ts; }
+}
+
+function truncSql(sql, id) {
+  const s = sql || "";
+  if (s.length <= 90) return '<span class="sql-cell">' + esc(s) + "</span>";
+  return '<span class="sql-cell">' + esc(s.slice(0, 90)) + "…</span> " +
+    '<button class="toggle-sql" data-sqlid="' + id + '">展开</button>' +
+    '<span class="sql-cell" id="fullsql-' + id + '" hidden><br>' + esc(s) + "</span>";
+}
+
+async function loadAudit() {
+  auditContent.innerHTML = '<div class="loading">正在加载审计记录…</div>';
+  try {
+    const resp = await fetch("/api/audit?limit=50");
+    if (!resp.ok) throw new Error("HTTP " + resp.status);
+    const records = await resp.json();
+    if (!records.length) {
+      auditContent.innerHTML = '<p class="hint">还没有查询记录，先去「提问」页问一个问题吧。</p>';
+      return;
+    }
+    let h = '<div class="table-wrap"><table class="data"><thead><tr>' +
+      "<th>时间</th><th>问题</th><th>SQL</th><th>行数</th><th>耗时</th><th>状态</th>" +
+      "</tr></thead><tbody>";
+    records.forEach((r, i) => {
+      const ok = !r.has_error;
+      const ms = (r.elapsed_ms == null) ? "—" : (Math.round(r.elapsed_ms) + " ms");
+      h += "<tr>" +
+        "<td style='white-space:nowrap'>" + esc(fmtTime(r.ts)) + "</td>" +
+        "<td style='white-space:normal;min-width:180px'>" + esc(r.question) + "</td>" +
+        "<td style='white-space:normal;min-width:200px'>" + truncSql(r.sql_text, i) + "</td>" +
+        '<td class="num">' + esc(r.row_count == null ? "—" : r.row_count) + "</td>" +
+        "<td style='white-space:nowrap'>" + esc(ms) + "</td>" +
+        '<td><span class="pill ' + (ok ? "ok" : "bad") + '">' + (ok ? "正常" : "出错") + "</span></td>" +
+        "</tr>";
+    });
+    h += "</tbody></table></div>";
+    h += '<p class="rowcount">' + records.length + " 条记录，按时间倒序</p>";
+    auditContent.innerHTML = h;
+    auditContent.querySelectorAll(".toggle-sql").forEach(b => {
+      b.onclick = () => {
+        const full = document.getElementById("fullsql-" + b.dataset.sqlid);
+        const open = full.hidden;
+        full.hidden = !open;
+        b.textContent = open ? "收起" : "展开";
+      };
+    });
+  } catch (e) {
+    auditContent.innerHTML = '<p class="err">加载审计记录失败：' + esc(e.message) + "</p>";
+  }
+}
+</script>
+</body>
+</html>

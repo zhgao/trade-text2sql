@@ -22,6 +22,11 @@ def is_llm_configured() -> bool:
     return bool(os.getenv("LLM_API_KEY", "").strip())
 
 
+def app_lang() -> str:
+    """界面与问答语言：APP_LANG=zh 时中文，其他一律英文（默认 en）。"""
+    return "zh" if os.getenv("APP_LANG", "en").strip().lower() == "zh" else "en"
+
+
 def get_llm():
     """返回 ChatOpenAI 实例；未配置 key 时返回 None（不抛异常）。"""
     if not is_llm_configured():

@@ -78,8 +78,10 @@ SCHEMA_CATALOG: dict = {
     },
 }
 
-# Few-shot examples: (English question, SQLite SQL), covering the main query patterns.
+# Few-shot examples: (English question, SQL), covering the main query patterns.
 # String literals keep the ledger's original values.
+# NOTE: the SQL below is SQLite-dialect. format_few_shots() rewrites the two
+# date expressions for the active dialect (see DIALECT_DATE).
 FEW_SHOTS: list = [
     (
         "What is the document status of L/C SCB2026LC001207?",
@@ -138,8 +140,81 @@ def format_schema(tables: "list[str] | None" = None) -> str:
     return "\n".join(lines)
 
 
-def format_few_shots() -> str:
+# Few-shot examples with Chinese questions (same SQL as FEW_SHOTS).
+# Used when APP_LANG=zh.
+FEW_SHOTS_ZH: list = [
+    (
+        "信用证 SCB2026LC001207 的单据状态如何？",
+        "SELECT doc_type, presented_date, status, discrepancies FROM documents "
+        "WHERE lc_number = 'SCB2026LC001207' LIMIT 50;",
+    ),
+    (
+        "提单号 COSU6123456780 的货物现在在哪里？",
+        "SELECT bl_number, vessel_voyage, port_loading, port_discharge, status, eta, ata "
+        "FROM shipments WHERE bl_number = 'COSU6123456780' LIMIT 50;",
+    ),
+    (
+        "有哪些逾期未付的款项？",
+        "SELECT lc_number, amount, currency, due_date, payer, payee FROM payments "
+        "WHERE status = '逾期' LIMIT 50;",
+    ),
+    (
+        "未来30天内有哪些信用证要到期？",
+        "SELECT lc_number, applicant, beneficiary, amount, currency, expiry_date, status "
+        "FROM letters_of_credit "
+        "WHERE expiry_date BETWEEN date('now') AND date('now', '+30 days') LIMIT 50;",
+    ),
+    (
+        "上海华贸进出口有限公司的信用证总额是多少？",
+        "SELECT currency, COUNT(*) AS lc_count, SUM(amount) AS total_amount "
+        "FROM letters_of_credit "
+        "WHERE applicant = '上海华贸进出口有限公司' OR beneficiary = '上海华贸进出口有限公司' "
+        "GROUP BY currency LIMIT 50;",
+    ),
+    (
+        "深圳恒信电子科技有限公司有哪些信用证？",
+        "SELECT lc_number, applicant, beneficiary, amount, currency, status, expiry_date "
+        "FROM letters_of_credit "
+        "WHERE applicant = '深圳恒信电子科技有限公司' OR beneficiary = '深圳恒信电子科技有限公司' "
+        "LIMIT 50;",
+    ),
+    (
+        "信用证 SCB2026LC001213 的发运状态如何？",
+        "SELECT bl_number, vessel_voyage, port_loading, port_discharge, status, eta "
+        "FROM shipments WHERE lc_number = 'SCB2026LC001213' LIMIT 50;",
+    ),
+]
+
+
+# Date-expression cheat sheet per SQL dialect. The demo ledger stores dates as
+# TEXT 'YYYY-MM-DD', so PostgreSQL/MySQL compare against text-formatted dates.
+# (If the date columns were real DATE types, drop the casts on PG / the
+# DATE_FORMAT() wrapper on MySQL.)
+DIALECT_DATE: dict = {
+    "sqlite": {
+        "today": "date('now')",
+        "next30": "date('now','+30 days')",
+    },
+    "postgresql": {
+        "today": "CURRENT_DATE::text",
+        "next30": "(CURRENT_DATE + INTERVAL '30 days')::text",
+    },
+    "mysql": {
+        "today": "DATE_FORMAT(CURDATE(), '%Y-%m-%d')",
+        "next30": "DATE_FORMAT(DATE_ADD(CURDATE(), INTERVAL 30 DAY), '%Y-%m-%d')",
+    },
+}
+
+
+def format_few_shots(lang: str = "en", dialect: str = "sqlite") -> str:
+    """Render few-shot examples; rewrites the SQLite date expressions for the dialect."""
+    examples = FEW_SHOTS_ZH if lang == "zh" else FEW_SHOTS
+    date_map = DIALECT_DATE.get(dialect, DIALECT_DATE["sqlite"])
     parts = []
-    for i, (q, sql) in enumerate(FEW_SHOTS, 1):
-        parts.append(f"Example {i}\nQuestion: {q}\nSQL: {sql}")
+    for i, (q, sql) in enumerate(examples, 1):
+        # longest expression first so date('now') doesn't eat the '+30 days' variant
+        sql = sql.replace("date('now', '+30 days')", date_map["next30"])
+        sql = sql.replace("date('now')", date_map["today"])
+        label = "问题" if lang == "zh" else "Question"
+        parts.append(f"Example {i}\n{label}: {q}\nSQL: {sql}")
     return "\n\n".join(parts)
