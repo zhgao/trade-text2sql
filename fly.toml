@@ -2,7 +2,7 @@
 # 无状态部署：SQLite 每次启动从种子数据重建，不挂 volume；
 # 闲时自动停机（auto_stop），被访问时自动唤醒，demo 场景成本接近零。
 app = "tradequery-bank-demo"
-primary_region = "hkg"
+primary_region = "sin"  # 注：hkg 已被 Fly.io 下架，亚洲就近用新加坡
 
 [env]
   PORT = "8000"
